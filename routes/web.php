@@ -19,6 +19,8 @@ Route::get('agent-list',[ReportController::class,'AgentListCustom'])->name('agen
 
 Route::get('agent-dispostion/{agentName}',[ReportController::class,'AgentDisposition'])->name('aget-dispostion');
 
+Route::get('full-day-dispo',[ReportController::class,'FullDayDispoList'])->name('full-day-dispo');
+
 
 // Route::get('query-results2', [ReportController2::class,'getResults'])->name('query-result');
 // Route::get('show-time2', [ReportController2::class,'showtime'])->name('showtime');

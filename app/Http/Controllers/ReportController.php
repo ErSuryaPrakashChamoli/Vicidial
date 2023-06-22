@@ -19,6 +19,9 @@ use App\Models\AgentDispostion;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
+
+use App\Models\AgentLogVici;
+
 class ReportController extends Controller
 {
 
@@ -772,5 +775,58 @@ class ReportController extends Controller
         //  dd($data['vicidialLogs']);
 
         return view('back_end/Report/agent_disposition', $data);
+    }
+
+
+    public function FullDayDispoList(Request $request){
+
+        // dd("enter here");
+
+
+        /*
+            
+        SELECT SEC_TO_TIME(SUM(talk_sec)) AS total_talk_time
+FROM vicidial_agent_log
+WHERE DATE(event_time) = CURDATE();
+        */
+          
+         $agentDayLog  = AgentLogVici::all()->toArray();
+         $today_date = Carbon::now()->toDateString();
+
+         $data['dailyDayReport']  = array();
+         
+        //  $data['agentDayLog']  = AgentLogVici::select(DB::raw('SEC_TO_TIME(SUM(talk_sec)) AS total_talk_time'))->where(function($query) use ($today_date){
+        //     $query->whereDate('event_time', $today_date);
+        //  })->get();
+
+         $agentDayLog  = AgentLogVici::select(DB::raw('SEC_TO_TIME(SUM(talk_sec)) AS total_talk_time',''))->where(function($query) use ($today_date){
+            $query->whereDate('event_time', $today_date);
+         })->get();
+         $agent_today_talktime = $agentDayLog[0]->total_talk_time;
+
+         $data['dailyDayReport']['todayTalkTime'] = $agent_today_talktime;
+
+
+
+         /* SELECT user, COUNT(*) AS total_calls
+FROM vicidial_agent_log
+GROUP BY user;
+*/
+           $agent_today_total_call = AgentLogVici::where(function($query) use($today_date){
+
+            $query->whereDate('event_time',$today_date);
+
+           })->count();      
+           
+           $data['dailyDayReport']['todayTotalCall'] = $agent_today_total_call;
+
+            
+           dd($data['dailyDayReport']);
+
+
+         $data['dailyDayReport']['today_talk_time'] = '';
+
+        return view('back_end/Report/fulldaydisp', $data);
+
     }
 }
